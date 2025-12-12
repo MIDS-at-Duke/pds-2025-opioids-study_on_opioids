@@ -47,21 +47,35 @@ pip install -r requirements.txt
 ```
 ### 2. Run data cleaning notebooks (02_data_preparation)
 
-01_population_cleaning.ipynb
+#### 01_population_cleaning.ipynb
 
-02_mortality_cleaning.ipynb
+#### 02_mortality_cleaning.ipynb
 
-03_arcos_processing.ipynb
+#### 03_arcos_processing.ipynb
 
 These generate cleaned files in 01_data/clean/.
 
 ### 3. Run data quality checks (03_data_quality)
 
-Investigate extreme values
+#### Investigate extreme values
 
-Merge datasets
+#### Merge datasets
 
-Select population thresholds
+#### Select population thresholds
+
+The notebook is about choosing a population threshold (a minimum county population) that balances:
+- Data completeness: avoiding too many missing values from suppressed CDC data
+- Sample size: keeping enough data for solid analysis
+- Geographic coverage: retaining a sufficient number of counties
+The purpose is to find an “elbow point” in the trade-off curve between missingness and population size.
+
+Drug-related mortality counts are suppressed in counties with fewer than 10 deaths, which creates substantial missingness in small-population counties. To determine an appropriate population threshold for inclusion, we evaluated how missingness, the number of retained observations, and the number of retained counties
+changed across thresholds.
+
+<img width="1789" height="489" alt="image" src="https://github.com/user-attachments/assets/30d2bf6f-a0a3-421b-9be2-89b15ee7d130" />
+
+
+This notebook includes charts on (1) percentage of missing mortality values, (2) total county-year observations retained, and (3) the number of unique counties retained at each threshold. A threshold of **150,000** residents strikes a balance between data completeness and sample coverage: at this cutoff, missingness is approximately 33.6%, the dataset retains 1,594 county-year observations, and 146 unique counties remain.
 
 ### 4. Run main analysis (04_main_analysis)
 
