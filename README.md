@@ -49,21 +49,41 @@ pip install -r requirements.txt
 
 #### 01_population_cleaning.ipynb
 
-This notebook processes U.S. Census county population estimates from multiple raw datasets spanning 2000–2024 to produce a unified, analysis-ready table for the opioid study. It loads three separate Census files covering 2000–2010, 2010–2019, and 2020–2024, filters for county-level records, reshapes each from wide to long format, generates standardized FIPS codes, and then concatenates them into a single dataset. Finally, it filters the combined data to include only the nine states relevant to the opioid policy analysis and exports the cleaned population file (`population_2000_2024.csv`).
+This notebook processes **U.S. Census county population estimates** from multiple raw datasets spanning 2000–2024 to produce a unified, analysis-ready table for the opioid study. It loads three separate Census files covering 2000–2010, 2010–2019, and 2020–2024, filters for county-level records, reshapes each from wide to long format, generates standardized FIPS codes, and then concatenates them into a single dataset. Finally, it filters the combined data to include only the nine states relevant to the opioid policy analysis and exports the cleaned population file (`population_2000_2024.csv`).
 
 #### 02_mortality_cleaning.ipynb
 
+This notebook cleans and processes **CDC mortality data (2003–2015)** to prepare it for analysis in the opioid study. It downloads a ZIP of annual mortality text files, reads and concatenates them into a single DataFrame, inspects the structure and missing values, and begins cleaning steps such as removing duplicates and handling unusual or placeholder values. The goal is to transform raw vital statistics into a structured dataset with county-level opioid-related death counts that can later be merged with population estimates and used for exploratory analysis and modeling in subsequent parts of the project.
+
 #### 03_arcos_processing.ipynb
 
-These generate cleaned files in 01_data/clean/.
+This notebook processes the **DEA ARCOS (Automation of Reports and Consolidated Orders System)** dataset to create a county-year aggregated view of opioid distribution for the study. It begins by defining and validating expected input files and required columns, loading a sample of the raw ARCOS transactional data to inspect structure and drug fields, and implementing helper functions for data quality checks (e.g., ensuring required files exist, checking for duplicates, and validating year ranges and positive values). The main pipeline then reads the full large ARCOS dataset in manageable chunks, **calculates Morphine Milligram Equivalents (MME) to standardize opioid quantity measures, aggregates the data by county and year,** and applies quality controls and validations, resulting in a cleaned, validated dataset suitable for merging with population and mortality data in subsequent analyses.
+
+These generate cleaned files in `01_data/clean/`.
 
 ### 3. Run data quality checks (03_data_quality)
 
-#### Investigate extreme values
+#### 01 Investigate extreme values
 
-#### Merge datasets
+This notebook investigates and identifies extreme outliers in the processed ARCOS opioid distribution data that likely reflect **non‑patient‑level transactions** (e.g., shipments involving manufacturers or distributors) rather than typical county opioid use. It loads the aggregated county‑year ARCOS dataset along with population estimates, merges them to compute per‑capita MME (morphine milligram equivalents) for each county and year, and then examines the distribution of these per‑capita values. **Counties with exceptionally high per‑capita MME** are flagged as “extreme,” and the notebook explores how these extremes relate to buyer business activity types to inform filtering and data‑quality decisions before further analysis.
 
-#### Select population thresholds
+- Before filtering:
+  - County-years: 8,386
+  - Extreme values: 89 (1.06%)
+  - Mean MME/capita: 1,453,856
+  - Max MME/capita: 2,534,741,636
+
+- After filtering:
+  - County-years: 7,369
+  - Extreme values: 2
+  - Mean MME/capita: 4,221
+  - Max MME/capita: 11,861,450
+
+#### 02 Merge datasets
+
+This notebook merges the three primary cleaned data sources—ARCOS opioid distribution data, county population estimates, and CDC mortality counts—into a single county‑year panel dataset for analysis. It starts by loading the cleaned ARCOS distribution totals (in morphine milligram equivalents), population data filtered to overlapping years (2006–2015), and aggregated mortality data for drug overdose deaths. It then constructs consistent merge keys across datasets, merges population with mortality, and finally merges in ARCOS totals, producing a unified table that preserves all county observations and includes per‑county population, mortality, and opioid distribution values. The merged dataset is saved as `final_merged.csv` for use in later exploratory and modeling steps.
+
+#### 03 Select population thresholds
 
 The notebook is about choosing a population threshold (a minimum county population) that balances:
 - Data completeness: avoiding too many missing values from suppressed CDC data
