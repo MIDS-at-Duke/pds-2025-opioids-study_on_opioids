@@ -49,6 +49,8 @@ pip install -r requirements.txt
 
 #### 01_population_cleaning.ipynb
 
+This notebook processes U.S. Census county population estimates from multiple raw datasets spanning 2000–2024 to produce a unified, analysis-ready table for the opioid study. It loads three separate Census files covering 2000–2010, 2010–2019, and 2020–2024, filters for county-level records, reshapes each from wide to long format, generates standardized FIPS codes, and then concatenates them into a single dataset. Finally, it filters the combined data to include only the nine states relevant to the opioid policy analysis and exports the cleaned population file (`population_2000_2024.csv`).
+
 #### 02_mortality_cleaning.ipynb
 
 #### 03_arcos_processing.ipynb
